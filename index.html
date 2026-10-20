@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopNex | Painel Administrativo</title>
+<style>
+:root {
+  --bg:#f4f6fa; --card:#fff; --text:#182230;
+  --muted:#718096; --primary:#2563eb; --border:#e7ebf1;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg); color:var(--text);
+}
+.layout { display:flex; min-height:100vh; }
+.sidebar {
+  width:245px; background:#101828; color:#fff;
+  padding:25px 16px; flex-shrink:0;
+}
+.brand { font-size:25px; font-weight:800; margin:5px 10px 8px; }
+.brand span { color:#60a5fa; }
+.subtitle { color:#98a2b3; font-size:12px; margin:0 10px 32px; }
+.nav-title {
+  font-size:11px; color:#98a2b3; text-transform:uppercase;
+  letter-spacing:1px; margin:22px 10px 10px;
+}
+.nav {
+  display:block; width:100%; border:0; background:transparent;
+  color:#d0d5dd; padding:13px 12px; border-radius:9px;
+  text-align:left; cursor:pointer; font-size:14px; margin:3px 0;
+}
+.nav:hover,.nav.active { background:#25334a; color:#fff; }
+.nav.active { box-shadow:inset 3px 0 #60a5fa; }
+.main { flex:1; min-width:0; }
+.topbar {
+  background:#fff; border-bottom:1px solid var(--border);
+  padding:18px 30px; display:flex; justify-content:space-between;
+  align-items:center; gap:12px;
+}
+.topbar strong { font-size:14px; }
+.admin { font-size:13px; color:#475467; }
+.content { padding:30px; max-width:1500px; margin:auto; }
+h1 { font-size:27px; margin:0 0 8px; }
+.description { color:var(--muted); margin:0 0 25px; font-size:14px; }
+.notice {
+  background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af;
+  padding:13px 15px; border-radius:10px; margin-bottom:22px;
+  font-size:13px; line-height:1.6;
+}
+.stats {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px; margin-bottom:24px;
+}
+.card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:13px; padding:20px; min-width:0;
+}
+.stat-label { color:var(--muted); font-size:13px; }
+.stat-value { font-size:27px; font-weight:750; margin:13px 0 8px; }
+.stat-foot { color:var(--muted); font-size:12px; }
+.section-head {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; margin-bottom:16px;
+}
+.section-head h2 { font-size:18px; margin:0; }
+.btn {
+  border:0; border-radius:8px; padding:11px 15px; cursor:pointer;
+  font-weight:650; font-size:13px;
+}
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-light { background:#eef2f7; color:#344054; }
+.btn:hover { opacity:.88; }
+.table-wrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:13px; }
+th,td { padding:15px 12px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+th { color:var(--muted); font-weight:600; background:#fafbfc; }
+.status {
+  display:inline-block; border-radius:20px; padding:5px 9px;
+  background:#dcfce7; color:#166534; font-size:11px;
+}
+.panel { display:none; }
+.panel.active { display:block; }
+.form-grid {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;
+}
+.field { display:flex; flex-direction:column; gap:7px; }
+.field label { font-size:13px; font-weight:600; }
+.field input,.field select {
+  border:1px solid #d0d5dd; border-radius:8px;
+  padding:12px; font-size:14px; background:#fff; width:100%;
+}
+.field.full { grid-column:1/-1; }
+.empty { padding:30px; text-align:center; color:var(--muted); }
+.footer { padding:25px 30px; color:var(--muted); font-size:12px; }
+@media(max-width:1000px) {
+  .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .sidebar { width:205px; }
+}
+@media(max-width:650px) {
+  .layout { display:block; }
+  .sidebar { width:100%; padding:15px; }
+  .subtitle,.nav-title { display:none; }
+  .brand { margin-bottom:14px; }
+  .nav { display:inline-block; width:auto; padding:10px; }
+  .topbar { padding:15px; }
+  .content { padding:18px 14px; }
+  .stats { gap:10px; }
+  .card { padding:14px; }
+  .stat-value { font-size:22px; }
+  .form-grid { grid-template-columns:1fr; }
+  .field.full { grid-column:auto; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">Shop<span>Nex</span></div>
+    <div class="subtitle">PAINEL DE CONTROLE</div>
+
+    <div class="nav-title">Principal</div>
+    <button class="nav active" data-panel="dashboard">▦ &nbsp; Visão geral</button>
+    <button class="nav" data-panel="products">□ &nbsp; Produtos</button>
+    <button class="nav" data-panel="orders">▤ &nbsp; Pedidos</button>
+
+    <div class="nav-title">Gestão da loja</div>
+    <button class="nav" data-panel="inventory">▣ &nbsp; Estoque</button>
+    <button class="nav" data-panel="finance">R$ &nbsp; Financeiro</button>
+    <button class="nav" data-panel="suppliers">♧ &nbsp; Fornecedores</button>
+
+    <div class="nav-title">Sistema</div>
+    <button class="nav" data-panel="settings">⚙ &nbsp; Configurações</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <strong id="page-label">Visão geral</strong>
+      <div class="admin">● &nbsp; Administrador</div>
+    </header>
+
+    <div class="content">
+      <section class="panel active" id="dashboard">
+        <h1>Visão geral</h1>
+        <p class="description">Bem-vindo ao centro de controle da ShopNex.</p>
+        <div class="notice">
+          <strong>Modo de demonstração.</strong>
+          Os indicadores abaixo são exemplos, não representam vendas reais.
+          A integração com o Supabase será feita na próxima etapa.
+        </div>
+        <div class="stats">
+          <div class="card">
+            <div class="stat-label">Faturamento</div>
+            <div class="stat-value">R$ 0,00</div>
+            <div class="stat-foot">Vendas confirmadas</div>
+          </div>
+          <div class="card">
+            <div class="stat-label">Pedidos</div>
+            <div class="stat-value" id="order-count">0</div>
+            <div class="stat-foot">Pedidos cadastrados nesta tela</div>
+          </div>
+          <div class="card">
+            <div class="stat-label">Produtos</div>
+            <div class="stat-value" id="product-count">3</div>
+            <div class="stat-foot">Produtos de demonstração</div>
+          </div>
+          <div class="card">
+            <div class="stat-label">Lucro estimado</div>
+            <div class="stat-value">R$ 0,00</div>
+            <div class="stat-foot">Aguardando integração financeira</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-head">
+            <h2>Produtos recentes</h2>
+            <button class="btn btn-primary" onclick="showPanel('products')">Ver produtos</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th></tr></thead>
+              <tbody id="recent-products"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="products">
+        <h1>Produtos</h1>
+        <p class="description">Consulte e cadastre produtos na demonstração do painel.</p>
+        <div class="card">
+          <div class="section-head">
+            <h2>Catálogo</h2>
+            <button class="btn btn-primary" onclick="showPanel('add-product')">+ Novo produto</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Custo</th><th>Estoque</th></tr></thead>
+              <tbody id="product-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="add-product">
+        <h1>Novo produto</h1>
+        <p class="description">Este formulário ainda não grava no banco de dados.</p>
+        <div class="card">
+          <form id="product-form" class="form-grid">
+            <div class="field full">
+              <label for="name">Nome do produto</label>
+              <input id="name" required placeholder="Ex.: Fone Bluetooth">
+            </div>
+            <div class="field">
+              <label for="category">Categoria</label>
+              <input id="category" required placeholder="Ex.: Eletrônicos">
+            </div>
+            <div class="field">
+              <label for="price">Preço de venda (R$)</label>
+              <input id="price" type="number" min="0" step="0.01" required>
+            </div>
+            <div class="field">
+              <label for="cost">Custo (R$)</label>
+              <input id="cost" type="number" min="0" step="0.01" required>
+            </div>
+            <div class="field">
+              <label for="stock">Quantidade em estoque</label>
+              <input id="stock" type="number" min="0" step="1" required>
+            </div>
+            <div class="field full">
+              <button class="btn btn-primary" type="submit">Adicionar à demonstração</button>
+              <button class="btn btn-light" type="button" onclick="showPanel('products')">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel" id="orders">
+        <h1>Pedidos</h1>
+        <p class="description">Acompanhe os pedidos da loja depois de conectar o banco.</p>
+        <div class="card">
+          <div class="empty">Nenhum pedido real carregado. Os pedidos aparecerão aqui após a integração com o Supabase.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="inventory">
+        <h1>Estoque</h1>
+        <p class="description">Visão de quantidades cadastradas na demonstração.</p>
+        <div class="card table-wrap">
+          <table><thead><tr><th>Produto</th><th>Quantidade</th><th>Situação</th></tr></thead>
+          <tbody id="stock-list"></tbody></table>
+        </div>
+      </section>
+
+      <section class="panel" id="finance">
+        <h1>Financeiro</h1>
+        <p class="description">A área financeira ficará ligada aos pedidos e custos reais.</p>
+        <div class="notice">Ainda não há transações reais conectadas. Não utilize estes dados para decisões financeiras.</div>
+        <div class="card">
+          <h2>Resumo financeiro</h2>
+          <p>Faturamento confirmado: R$ 0,00</p>
+          <p>Custos de produtos vendidos: R$ 0,00</p>
+          <p>Taxas e fretes: R$ 0,00</p>
+          <p><strong>Lucro líquido: aguardando integração</strong></p>
+        </div>
+      </section>
+
+      <section class="panel" id="suppliers">
+        <h1>Fornecedores</h1>
+        <p class="description">Área reservada para cadastrar e acompanhar fornecedores.</p>
+        <div class="card">
+          <div class="empty">Nenhum fornecedor exibido. A conexão com a tabela de fornecedores será configurada depois.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="settings">
+        <h1>Configurações</h1>
+        <p class="description">Configurações da plataforma ShopNex.</p>
+        <div class="card">
+          <p><strong>Projeto:</strong> ShopNex</p>
+          <p><strong>Banco de dados:</strong> Supabase</p>
+          <p><strong>Pagamento:</strong> Mercado Pago — ainda não conectado</p>
+          <p><strong>Modo:</strong> Demonstração</p>
+        </div>
+      </section>
+    </div>
+    <footer class="footer">ShopNex © 2026 · Painel administrativo</footer>
+  </main>
+</div>
+
+<script>
+const products = [
+  {name:"Fone Bluetooth",category:"Eletrônicos",price:79.90,cost:35.00,stock:20},
+  {name:"Mochila Casual",category:"Acessórios",price:99.90,cost:45.00,stock:15},
+  {name:"Garrafa Térmica",category:"Casa e utilidades",price:49.90,cost:20.00,stock:30}
+];
+
+const money = value => value.toLocaleString("pt-BR", {
+  style:"currency",currency:"BRL"
+});
+
+function renderProducts() {
+  const rows = products.map(p =>
+    `<tr><td>${escapeHTML(p.name)}</td><td>${escapeHTML(p.category)}</td>
+    <td>${money(p.price)}</td><td>${money(p.cost)}</td><td>${p.stock}</td></tr>`
+  ).join("");
+  document.getElementById("product-list").innerHTML = rows;
+  document.getElementById("recent-products").innerHTML = products.slice(-5).map(p =>
+    `<tr><td>${escapeHTML(p.name)}</td><td>${escapeHTML(p.category)}</td>
+    <td>${money(p.price)}</td><td>${p.stock}</td></tr>`
+  ).join("");
+  document.getElementById("stock-list").innerHTML = products.map(p =>
+    `<tr><td>${escapeHTML(p.name)}</td><td>${p.stock}</td>
+    <td><span class="status">${p.stock > 0 ? "Disponível" : "Sem estoque"}</span></td></tr>`
+  ).join("");
+  document.getElementById("product-count").textContent = products.length;
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function showPanel(id) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav").forEach(b =>
+    b.classList.toggle("active", b.dataset.panel === id)
+  );
+  const button = document.querySelector(`.nav[data-panel="${id}"]`);
+  document.getElementById("page-label").textContent =
+    button ? button.textContent.trim().replace(/^[▦□▤▣♧⚙R$]+\s*/, "") :
+    id === "add-product" ? "Novo produto" : "ShopNex";
+}
+
+document.querySelectorAll(".nav").forEach(button => {
+  button.addEventListener("click", () => showPanel(button.dataset.panel));
+});
+
+document.getElementById("product-form").addEventListener("submit", event => {
+  event.preventDefault();
+  products.push({
+    name:document.getElementById("name").value.trim(),
+    category:document.getElementById("category").value.trim(),
+    price:Number(document.getElementById("price").value),
+    cost:Number(document.getElementById("cost").value),
+    stock:Number(document.getElementById("stock").value)
+  });
+  renderProducts();
+  event.target.reset();
+  showPanel("products");
+  alert("Produto adicionado apenas à demonstração desta página. Ainda não foi salvo no Supabase.");
+});
+
+renderProducts();
+</script>
+</body>
+</html>
