@@ -300,22 +300,7 @@ const money = value => value.toLocaleString("pt-BR", {
   style:"currency",currency:"BRL"
 });
 
-function renderProducts() {
-  const rows = products.map(p =>
-    `<tr><td>${escapeHTML(p.name)}</td><td>${escapeHTML(p.category)}</td>
-    <td>${money(p.price)}</td><td>${money(p.cost)}</td><td>${p.stock}</td></tr>`
-  ).join("");
-  document.getElementById("product-list").innerHTML = rows;
-  document.getElementById("recent-products").innerHTML = products.slice(-5).map(p =>
-    `<tr><td>${escapeHTML(p.name)}</td><td>${escapeHTML(p.category)}</td>
-    <td>${money(p.price)}</td><td>${p.stock}</td></tr>`
-  ).join("");
-  document.getElementById("stock-list").innerHTML = products.map(p =>
-    `<tr><td>${escapeHTML(p.name)}</td><td>${p.stock}</td>
-    <td><span class="status">${p.stock > 0 ? "Disponível" : "Sem estoque"}</span></td></tr>`
-  ).join("");
-  document.getElementById("product-count").textContent = products.length;
-}
+dutfunction renderProducts()
 
 function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, c => ({
@@ -332,7 +317,7 @@ function showPanel(id) {
   const button = document.querySelector(`.nav[data-panel="${id}"]`);
   document.getElementById("page-label").textContent =
     button ? button.textContent.trim().replace(/^[▦□▤▣♧⚙R$]+\s*/, "") :
-    id === "add-product" ? "Novo produto" : "ShopNex";
+    id === "add-product" ? "Novo proo" : "ShopNex";
 }
 
 document.querySelectorAll(".nav").forEach(button => {
