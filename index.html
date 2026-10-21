@@ -438,13 +438,6 @@ productForm.addEventListener("submit", async event => {
 });
 
 
-    renderProducts();
-    event.target.reset();
-    showPanel("products");
-    alert("Produto adicionado somente nesta demonstração. Ainda não foi salvo no banco de dados.");
-  });
-}
-
 renderProducts();
 
 const SUPABASE_URL = "https://hsxyhnojlbvujtzrvyxs.supabase.co";
@@ -478,6 +471,5 @@ async function carregarProdutosSupabase() {
 
 carregarProdutosSupabase();
 </script>
-
 </body>
 </html>
