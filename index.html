@@ -376,16 +376,67 @@ document.querySelectorAll(".nav").forEach(button => {
 
 const productForm = document.getElementById("product-form");
 if (productForm) {
-  productForm.addEventListener("submit", event => {
-    event.preventDefault();
+  
+productForm.addEventListener("submit", async event => {
+  event.preventDefault();
 
-    products.push({
-      name:document.getElementById("name").value.trim(),
-      category:document.getElementById("category").value.trim(),
-      price:Number(document.getElementById("price").value),
-      cost:Number(document.getElementById("cost").value),
-      stock:Number(document.getElementById("stock").value)
-    });
+  const produto = {
+    name: document.getElementById("name").value.trim(),
+    category: document.getElementById("category").value.trim(),
+    price: Number(document.getElementById("price").value),
+    cost: Number(document.getElementById("cost").value),
+    stock: Number(document.getElementById("stock").value),
+    active: true
+  };
+
+  if (!produto.name || !produto.category ||
+      produto.price <= 0 || produto.cost < 0 ||
+      produto.stock < 0) {
+    alert("Confira os campos. Nome e categoria são obrigatórios, o preço deve ser maior que zero e custo e estoque não podem ser negativos.");
+    return;
+  }
+
+  const botao = productForm.querySelector('[type="submit"]');
+  if (botao) botao.disabled = true;
+
+  try {
+    const resposta = await fetch(
+      `${SUPABASE_URL}/rest/v1/products`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify(produto)
+      }
+    );
+
+    if (!resposta.ok) {
+      const erro = await resposta.text();
+      throw new Error(erro || `Erro HTTP ${resposta.status}`);
+    }
+
+    const salvos = await resposta.json();
+
+    if (salvos.length > 0) {
+      products.unshift(salvos[0]);
+    }
+
+    renderProducts();
+    productForm.reset();
+    showPanel("products");
+    alert("Produto salvo no Supabase com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao salvar produto:", erro);
+    alert("Não foi possível salvar no banco. Verifique as permissões da tabela products no Supabase.");
+  } finally {
+    if (botao) botao.disabled = false;
+  }
+});
+
 
     renderProducts();
     event.target.reset();
