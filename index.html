@@ -289,6 +289,7 @@ th { color:var(--muted); font-weight:600; background:#fafbfc; }
   </main>
 </div>
 
+
 <script>
 let products = [
   {name:"Fone Bluetooth",category:"Eletrônicos",price:79.90,cost:35.00,stock:20},
@@ -296,48 +297,102 @@ let products = [
   {name:"Garrafa Térmica",category:"Casa e utilidades",price:49.90,cost:20.00,stock:30}
 ];
 
-const money = value => value.toLocaleString("pt-BR", {
-  style:"currency",currency:"BRL"
+const money = value => Number(value || 0).toLocaleString("pt-BR", {
+  style:"currency",
+  currency:"BRL"
 });
 
-dutfunction renderProducts()
-
 function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, c => ({
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
 
+function renderProducts() {
+  const productList = document.getElementById("product-list");
+  const recentProducts = document.getElementById("recent-products");
+  const stockList = document.getElementById("stock-list");
+  const productCount = document.getElementById("product-count");
+
+  if (productCount) productCount.textContent = products.length;
+
+  if (productList) {
+    productList.innerHTML = products.length ? products.map(p => `
+      <tr>
+        <td>${escapeHTML(p.name)}</td>
+        <td>${escapeHTML(p.category)}</td>
+        <td>${money(p.price)}</td>
+        <td>${money(p.cost)}</td>
+        <td>${Number(p.stock) || 0}</td>
+      </tr>
+    `).join("") : '<tr><td colspan="5">Nenhum produto encontrado.</td></tr>';
+  }
+
+  if (recentProducts) {
+    recentProducts.innerHTML = products.length ? products.slice(0,5).map(p => `
+      <tr>
+        <td>${escapeHTML(p.name)}</td>
+        <td>${escapeHTML(p.category)}</td>
+        <td>${money(p.price)}</td>
+        <td>${Number(p.stock) || 0}</td>
+      </tr>
+    `).join("") : '<tr><td colspan="4">Nenhum produto encontrado.</td></tr>';
+  }
+
+  if (stockList) {
+    stockList.innerHTML = products.length ? products.map(p => `
+      <tr>
+        <td>${escapeHTML(p.name)}</td>
+        <td>${Number(p.stock) || 0}</td>
+        <td>${Number(p.stock) > 0 ? "Disponível" : "Sem estoque"}</td>
+      </tr>
+    `).join("") : '<tr><td colspan="3">Nenhum produto encontrado.</td></tr>';
+  }
+}
+
 function showPanel(id) {
+  const panel = document.getElementById(id);
+  if (!panel) return;
+
   document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.querySelectorAll(".nav").forEach(b =>
-    b.classList.toggle("active", b.dataset.panel === id)
+  panel.classList.add("active");
+
+  document.querySelectorAll(".nav").forEach(button =>
+    button.classList.toggle("active", button.dataset.panel === id)
   );
+
   const button = document.querySelector(`.nav[data-panel="${id}"]`);
-  document.getElementById("page-label").textContent =
-    button ? button.textContent.trim().replace(/^[▦□▤▣♧⚙R$]+\s*/, "") :
-    id === "add-product" ? "Novo proo" : "ShopNex";
+  const label = document.getElementById("page-label");
+  if (label) {
+    label.textContent = button
+      ? button.textContent.trim().replace(/^[▦□▤▣♧⚙R$]+\s*/, "")
+      : id === "add-product" ? "Novo produto" : "ShopNex";
+  }
 }
 
 document.querySelectorAll(".nav").forEach(button => {
   button.addEventListener("click", () => showPanel(button.dataset.panel));
 });
 
-document.getElementById("product-form").addEventListener("submit", event => {
-  event.preventDefault();
-  products.push({
-    name:document.getElementById("name").value.trim(),
-    category:document.getElementById("category").value.trim(),
-    price:Number(document.getElementById("price").value),
-    cost:Number(document.getElementById("cost").value),
-    stock:Number(document.getElementById("stock").value)
+const productForm = document.getElementById("product-form");
+if (productForm) {
+  productForm.addEventListener("submit", event => {
+    event.preventDefault();
+
+    products.push({
+      name:document.getElementById("name").value.trim(),
+      category:document.getElementById("category").value.trim(),
+      price:Number(document.getElementById("price").value),
+      cost:Number(document.getElementById("cost").value),
+      stock:Number(document.getElementById("stock").value)
+    });
+
+    renderProducts();
+    event.target.reset();
+    showPanel("products");
+    alert("Produto adicionado somente nesta demonstração. Ainda não foi salvo no banco de dados.");
   });
-  renderProducts();
-  event.target.reset();
-  showPanel("products");
-  alert("Produto adicionado apenas à demonstração desta página. Ainda não foi salvo no Supabase.");
-});
+}
 
 renderProducts();
 
@@ -348,37 +403,30 @@ async function carregarProdutosSupabase() {
   try {
     const resposta = await fetch(
       `${SUPABASE_URL}/rest/v1/products?select=id,name,description,category,image_url,price,cost,stock,active,created_at&active=eq.true&order=created_at.desc`,
-      {
-       
-headers: {
-  apikey: SUPABASE_KEY
-}
- 
+      {headers:{apikey:SUPABASE_KEY}}
+    );
 
-    if (!resposta.ok) {
-      throw new Error("Erro HTTP " + resposta.status);
-    }
+    if (!resposta.ok) throw new Error("Erro HTTP " + resposta.status);
 
     const dados = await resposta.json();
-
     products = dados.map(p => ({
       ...p,
-      name: p.name || "",
-      category: p.category || "",
-      price: Number(p.price) || 0,
-      cost: Number(p.cost) || 0,
-      stock: Number(p.stock) || 0
+      name:p.name || "",
+      category:p.category || "",
+      price:Number(p.price) || 0,
+      cost:Number(p.cost) || 0,
+      stock:Number(p.stock) || 0
     }));
 
     renderProducts();
   } catch (erro) {
     console.error("Erro Supabase:", erro);
-    alert("Não foi possível carregar os produtos. Verifique a chave pública e as permissões do Supabase.");
+    alert("Não foi possível carregar os produtos do Supabase. Os menus continuam disponíveis.");
   }
 }
 
 carregarProdutosSupabase();
-
 </script>
+
 </body>
 </html>
