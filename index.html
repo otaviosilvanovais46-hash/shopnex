@@ -443,7 +443,10 @@ renderProducts();
 
 const SUPABASE_URL = "https://hsxyhnojlbvujtzrvyxs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_LKNAb7445Ntb8Tj8eU-l2A_-Sg7GQOT";
-
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 async function carregarProdutosSupabase() {
   try {
     const resposta = await fetch(
