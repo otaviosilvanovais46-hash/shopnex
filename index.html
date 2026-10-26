@@ -486,5 +486,50 @@ async function carregarProdutosSupabase() {
 
 carregarProdutosSupabase();    
 </script>
+ <!-- LOGIN ADMINISTRATIVO SHOPNEX -->
+<section id="admin-login" style="
+  display:none;
+  max-width:420px;
+  margin:30px auto;
+  padding:24px;
+  background:#ffffff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  font-family:Arial,sans-serif;
+">
+  <h2>Login administrativo</h2>
+  <p>Entre para gerenciar os produtos da ShopNex.</p>
+
+  <form id="admin-login-form">
+    <label for="admin-email">E-mail</label>
+    <input
+      id="admin-email"
+      type="email"
+      autocomplete="username"
+      required
+      style="display:block;width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;"
+    >
+
+    <label for="admin-password">Senha</label>
+    <input
+      id="admin-password"
+      type="password"
+      autocomplete="current-password"
+      required
+      style="display:block;width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;"
+    >
+
+    <button type="submit" style="padding:12px 20px;cursor:pointer;">
+      Entrar
+    </button>
+
+    <p id="admin-login-message" role="status"></p>
+  </form>
+
+  <button id="admin-logout" type="button" style="display:none;">
+    Sair
+  </button>
+</section>
+<!-- FIM DO LOGIN ADMINISTRATIVO --> 
 </body>
 </html>
